@@ -5,7 +5,7 @@
   - [Recipes](#recipes)
     - [Hello World](#hello-world)
     - [Simple Todo App](#simple-todo-app)
-  - [Notice](#notice)
+  - [Caveats](#caveats)
     - [Do not use self closing tag](#do-not-use-self-closing-tag)
 
 # `DOMEZ`
@@ -104,6 +104,8 @@ const App = ({ list, ref }) => {
     // after creating the child block, the list will store the block controller for later use
     const param = { id, title, onRemove };
     todoList.push(param);
+    inputRef().value = "";
+    inputRef().focus();
   };
 
   return `
@@ -117,7 +119,41 @@ const App = ({ list, ref }) => {
 render(document.body, App);
 ```
 
-## Notice
+Compare to Vanilla JS
+
+```js
+const createTodo = (todo) => {
+  const div = document.createElement("div");
+  div.onclick = () => div.remove();
+  div.textContent = `${todo.id} ${todo.title}`;
+  return div;
+};
+
+const App = () => {
+  let uniqueId = 0;
+
+  document.body.innerHTML = `
+    <input id="input"/><button id="button">Add</button>
+    <div id="list"></div>
+    `;
+  const $input = document.getElementById("input");
+  const $button = document.getElementById("button");
+  const $list = document.getElementById("list");
+
+  $button.onclick = () => {
+    const id = uniqueId++;
+    const title = $input.value;
+    const $todo = createTodo({ id, title });
+    $list.appendChild($todo);
+    $input.value = "";
+    $input.focus();
+  };
+};
+
+App();
+```
+
+## Caveats
 
 ### Do not use self closing tag
 

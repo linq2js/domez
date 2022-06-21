@@ -105,6 +105,7 @@ export type ElementData<E> = {
 export type Context = {
   readonly parent?: Context;
   readonly id: string;
+
   ref<E extends HTMLElement = HTMLElement>(data: ElementData<E>): ElementRef<E>;
 
   ref<E extends HTMLElement = HTMLElement>(): ElementRef<E>;
