@@ -34,7 +34,7 @@ yarn add domez
 
 ## Motivation
 
-There are many frameworks for DOM manipulation like React, Angular, Vue, etc. they are difficult to learn and cumbersome. Domez was born to make it easier to handle the DOM instead of using Vanilla JS. Domez also makes debugging convenient and easy. It is also compatible with many CSS Frameworks like Tailwind JS, Bootstrap JS
+There are many frameworks for DOM manipulation like React, Angular, Vue, etc. they are difficult to learn and cumbersome. Domez was born to process the DOM rendering with ease, instead of using Vanilla JS. Domez also makes debugging convenient and easy. It is also compatible with many CSS Frameworks like Tailwind JS, Bootstrap JS
 
 ## Recipes
 
