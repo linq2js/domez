@@ -88,11 +88,12 @@ const Todo = ({ ref }, todo) => {
 };
 
 const App = ({ list, ref }) => {
+  let uniqueId = 1;
   const inputRef = ref();
   // create a element list and specific builder for each item
   const todoList = list(Todo);
   const handleAdd = () => {
-    const id = Math.random();
+    const id = uniqueId++;
     // inputRef() returns current ref of target element
     const title = inputRef().value;
     // remove an list item that has id equals to current todo id
@@ -107,7 +108,7 @@ const App = ({ list, ref }) => {
 
   return `
   <div>
-    <input ${inputRef} /><button ${ref({ onclick: handleAdd })}></button>
+    <input ${inputRef} /><button ${ref({ onclick: handleAdd })}>Add</button>
     ${todoList}
   </div>
   `;

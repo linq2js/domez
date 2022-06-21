@@ -29,7 +29,8 @@ export type Part = {
 };
 
 export type List<C, D> = {
-  ref: Ref<() => void>;
+  readonly ref: Ref<() => void>;
+  readonly size: number;
   get(index: number): C | undefined;
   set(index: number, data: D): C;
   remove(index: number): C | undefined;
@@ -323,6 +324,9 @@ const createList = <C extends Controller, D>(
   );
   const list: List<C, D> = {
     ref,
+    get size() {
+      return items.length;
+    },
     get(index) {
       return items[index]?.controller;
     },
