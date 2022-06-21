@@ -34,6 +34,5 @@
     "clean": "rm -rf dist build package",
     "ts-node": "ts-node",
     "build": "rimraf dist && tsc && npx gzip-size ./dist/tsc/main.js"
-  },
-  "gitHead": "ba5727dcd44c6f7a01daede877dcdd9da8d71a73"
+  }
 }
