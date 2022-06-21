@@ -1,5 +1,5 @@
 # `DOMEZ`
 
-A tiny DOM rendering lib
+A tiny lib for DOM rendering
 
 [Documentations](./packages/domez/readme.md)
