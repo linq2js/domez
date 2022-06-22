@@ -5,6 +5,8 @@
   - [Recipes](#recipes)
     - [Hello World](#hello-world)
     - [Simple Todo App](#simple-todo-app)
+    - [Using element ref](#using-element-ref)
+    - [Set initial props/style for specified element](#set-initial-propsstyle-for-specified-element)
   - [Caveats](#caveats)
     - [Do not use self closing tag](#do-not-use-self-closing-tag)
 
@@ -151,6 +153,56 @@ const App = () => {
 };
 
 App();
+```
+
+### Using element ref
+
+```js
+const App = ({ ref, effect }) => {
+  const divRef = ref();
+
+  // WRONG: the div ref is not ready here
+  divRef().textContent = "Hello World";
+
+  // RIGHT: use effect to make sure all refs are ready to use
+  effect(() => {
+    divRef().textContent = "Hello World";
+  });
+
+  return `<div ${divRef}></div>`;
+};
+```
+
+### Set initial props/style for specified element
+
+```js
+const App = ({ ref }) => {
+  return `<div ${ref({
+    text: "Hello World", // OR you can set inner HTML { html: '<i>Hello World</i>' }
+    style: "color: red", // OR { style: { color: 'red' } }
+    onclick: () => alert("Hello World"),
+    // OR { class: 'my-class' }
+    class: {
+      btn: true,
+      "btn-primary": true,
+    },
+  })}></div>`;
+};
+
+// that equipments to this
+const App = ({ ref, effect }) => {
+  const divRef = ref();
+
+  effect(() => {
+    divRef().textContent = "Hello World";
+    divRef().onclick = () => alert("Hello World");
+    divRef().classList.add("btn");
+    divRef().classList.add("btn-primary");
+    divRef().style.cssText = "color: red";
+  });
+
+  return `<div ${divRef}></div>`;
+};
 ```
 
 ## Caveats

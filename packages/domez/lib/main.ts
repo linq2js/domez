@@ -14,12 +14,7 @@ export type Ref<A extends (...args: any[]) => any> = A & {
   toString(): string;
 };
 
-export type PartAccessor = {
-  (): boolean;
-  (visible: boolean): void;
-};
-
-export type Part = {
+export type Toggle = {
   ref: Ref<() => void>;
   show(): void;
   hide(): void;
@@ -123,7 +118,11 @@ export type Context = {
    */
   effect(effect: Effect): void;
 
-  toggle(visible?: boolean): Part;
+  /**
+   * create an element toggle ref
+   * @param visible
+   */
+  toggle(visible?: boolean): Toggle;
 
   /**
    * create list of block
@@ -225,15 +224,43 @@ export type Watcher<T> = {
    */
   html(transform: (value: T) => any): ElementRef;
 
+  /**
+   * return a binding that does show/hide target element according to signal value
+   */
   show(): ElementRef;
+
+  /**
+   * return a binding that does show/hide target element according to signal value
+   * @param transform
+   */
   show(transform: (value: T) => any): ElementRef;
 
+  /**
+   * return a binding that does show/hide target element according to signal value
+   */
   hide(): ElementRef;
+
+  /**
+   * return a binding that does show/hide target element according to signal value
+   * @param transform
+   */
   hide(transform: (value: T) => any): ElementRef;
 };
 
+/**
+ * controller is result of block builder. It must have template prop
+ */
 export type Controller = { template: string };
 
+/**
+ * block builder is a pure function that retrieves context for building block.
+ * If the block builder has a second argument as required, you must provide the second param when building block
+ * ```js
+ * const Counter = (context, initialValue) => {}
+ *
+ * ref(Counter, 1);
+ * ```
+ */
 export type BlockBuilder<R extends Controller = { template: "" }, D = void> =
   | ((context: Context) => R | string)
   | ((context: Context, data: D) => R | string);
@@ -569,7 +596,7 @@ const createToggle = (
     }
   );
 
-  const toggle: Part = {
+  const toggle: Toggle = {
     ref,
     get visible() {
       return visible;
@@ -871,7 +898,7 @@ const createBlock = <C extends Controller, D>(
   let id = "";
   let block: Block<C>;
   let controller: C;
-  const refs: Ref<any>[] = [];
+  const refs: Ref<() => any>[] = [];
   const effects: Effect[] = [];
   const onUnmount = new Set<VoidFunction>();
 
@@ -936,6 +963,7 @@ const createBlock = <C extends Controller, D>(
       };
 
       return {
+        bind,
         text(transform?: Function) {
           if (transform) {
             return bind((value: any) => ({ text: transform(value) }));
@@ -948,7 +976,6 @@ const createBlock = <C extends Controller, D>(
           }
           return bind((html: any) => ({ html }));
         },
-        bind,
         show(transform?: Function) {
           return toggle(false, transform);
         },
