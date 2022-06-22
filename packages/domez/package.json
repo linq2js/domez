@@ -1,6 +1,6 @@
 {
   "name": "domez",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A tiny lib for DOM rendering",
   "author": "linq2js <linqtojs@gmail.com>",
   "repository": {
