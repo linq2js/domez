@@ -539,7 +539,7 @@ const createRef = <A extends (...args: any[]) => any>(
     Object.assign(ref, {
       style: (value: any) => setStyle(ref(), value),
       class: (value: any) => setClass(ref(), value),
-      update: (value: any) => updateElement(ref(), value),
+      update: (value: any) => updateElement(ref(), value, id),
     });
   }
 
@@ -732,33 +732,69 @@ const createSignal: CreateSignal = (
   };
 };
 
-export const setClass = (element: HTMLElement, value: ElementClass) => {
-  const array = Array.isArray(value) ? value : [value];
-  array.forEach((c) => {
-    if (!c) return;
-    if (typeof c === "string") {
-      element.classList.add(c);
+export const setClass = (
+  element: HTMLElement,
+  value: ElementClass,
+  id?: any
+) => {
+  let classes: Map<any, any> = (element as any).__classes;
+  if (!classes) {
+    (element as any).__classes = classes = new Map();
+    // default style
+    classes.set(element, element.className);
+  }
+
+  classes.set(id, value);
+  // combine all classes
+  const classNames: string[] = [];
+  classes.forEach((value) => {
+    if (!value) return;
+    if (typeof value === "string") {
+      classNames.push(value);
     } else {
-      Object.entries(c).forEach(([key, flag]) => {
-        element.classList.toggle(key, !!flag);
+      Object.entries(value).forEach(([key, value]) => {
+        if (value) classNames.push(key);
       });
     }
   });
+  if (classNames.length) {
+    element.className = classNames.join(" ");
+  }
 };
 
-export const setStyle = (element: HTMLElement, style: ElementStyle) => {
-  if (typeof style === "string") {
-    element.style.cssText = style;
-  } else {
-    Object.entries(style).forEach(([key, value]) => {
-      element.style[key as any] = value as any;
-    });
+export const setStyle = (
+  element: HTMLElement,
+  style: ElementStyle,
+  id?: any
+) => {
+  let styles: Map<any, any> = (element as any).__styles;
+  if (!styles) {
+    (element as any).__styles = styles = new Map();
+    // default style
+    styles.set(element, element.style.cssText);
   }
+
+  styles.set(id, style);
+  // combine all css texts
+  const cssTexts: string[] = [];
+  const cssProps: Record<string, any> = {};
+  styles.forEach((value) => {
+    if (typeof value === "string") {
+      cssTexts.push(value);
+    } else {
+      Object.assign(cssProps, value);
+    }
+  });
+  if (cssTexts.length) {
+    element.style.cssText = cssTexts.join(";");
+  }
+  Object.assign(element.style, cssProps);
 };
 
 export const updateElement = <E extends HTMLElement = HTMLElement>(
   element: E,
-  data: ElementData<E>
+  data: ElementData<E>,
+  id?: any
 ) => {
   if ("text" in data) {
     element.textContent = data.text;
@@ -796,11 +832,11 @@ export const updateElement = <E extends HTMLElement = HTMLElement>(
   }
 
   if (klass) {
-    setClass(element, klass);
+    setClass(element, klass, id);
   }
 
   if (style) {
-    setStyle(element, style);
+    setStyle(element, style, id);
   }
 };
 
@@ -879,7 +915,7 @@ const createBlock = <C extends Controller, D>(
           context.on(signal, (value) => {
             const data = updater(value, element, cache);
             if (!data) return;
-            updateElement(element as HTMLElement, data);
+            updateElement(element as HTMLElement, data, id);
           });
         });
         refs.push(ref);
@@ -962,7 +998,7 @@ const createBlock = <C extends Controller, D>(
       // ref(updateProps)
       else if (args[0] && typeof args[0] === "object") {
         ref = createRef(id, "attribute", (element) => {
-          updateElement(element as HTMLElement, args[0]);
+          updateElement(element as HTMLElement, args[0], id);
         });
       } else {
         throw new Error("Invalid ref");
